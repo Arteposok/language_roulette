@@ -1,7 +1,8 @@
-"""Welcome to Reflex! This file outlines the steps to create a basic app."""
+import asyncio
 
 import reflex as rx
 import random as rnd
+import time
 
 
 class State(rx.State):
@@ -9,17 +10,12 @@ class State(rx.State):
     languages=[
         "C#",
         "C#",
-        "C#",
         "Python",
-        "Python",
-        "JavaScript",
         "JavaScript",
         "TypeScript",
         "Rust",
         "Python",
-        "Rust",
         "Python",
-        "Mojo",
         "Mojo",
         "Java",
         "C++",
@@ -32,16 +28,29 @@ class State(rx.State):
         "Go",
         "Visual Basic",
         "Kotlin",
-        "Python",
         "Swift",
         "VBA",
         "ActionScript",
         "Delphi",
     ]
 
-    def pick(self):
-        self.language=rnd.choice(self.languages)
 
+
+    async def pick(self):
+        language=rnd.choice(self.languages)
+        yield
+        for x in range(5):
+            await asyncio.sleep(0.1)
+            lang = rnd.choice(self.languages)
+            for i in range(len(lang)+1):
+                await asyncio.sleep(0.05)
+                self.language="$> "+lang[:i]+(" //" if i % 2 == 0 else "")
+                yield
+            yield
+        for i in range(len(language) + 1):
+            await asyncio.sleep(0.1)
+            self.language = "$> "+language[:i]+" //"
+            yield
 
 def index() -> rx.Component:
     return rx.container(
@@ -59,7 +68,8 @@ def index() -> rx.Component:
                         rx.code(
                             State.language,
                             size="9",
-                            color_scheme="indigo"
+                            color_scheme="indigo",
+
                         ),
                         size="9"
                     ),
